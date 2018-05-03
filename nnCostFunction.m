@@ -63,21 +63,64 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+%(nn_params, ...
+%input_layer_size, ...
+%hidden_layer_size, ...
+%num_labels, ...
+%X, y, lambda)
 
+% PART 1
 
+% every column is one training 
+temp_y = zeros(m, max(y));
+for i = 1:m
+    temp_y(i, y(i)) = 1;
+end
+y = temp_y;
 
+a1 = [ones(m,1) X];
 
+z2 = a1 * Theta1';
+a2 = sigmoid(z2);
+a2 = [ones(m,1) a2];
 
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+hypothesis = a3; 
 
+%size(hypothesis)
+%size(y)
 
+J = sum(sum(1/m * ((-y) .* log(hypothesis) - (1 - y) .* log(1 - hypothesis)))); %+ reg_theta_cost;
 
+%size(J)
 
+% God praise the holy normal multiplication
 
+regularize = lambda / (2*m) * (sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)));
 
+J = J + regularize;
 
+% Part 2
 
+% yes........
+error3 = a3 - y;
 
+error2 = (error3 * Theta2);
+error2 = error2(:,2:end) .* sigmoidGradient(z2);
 
+delta1 = error2' * a1;
+delta2 = error3' * a2;
+
+Theta1_grad = delta1 / m;
+[row,col] = size(Theta1);
+Theta1_no_bias = [zeros(row,1) Theta1(:,2:end)];
+Theta1_grad = Theta1_grad + lambda / m * Theta1_no_bias;
+
+Theta2_grad = delta2 / m;
+[row,col] = size(Theta2);
+Theta2_no_bias = [zeros(row,1) Theta2(:,2:end)];
+Theta2_grad = Theta2_grad + lambda / m * Theta2_no_bias;
 
 
 % -------------------------------------------------------------
